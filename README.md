@@ -22,13 +22,64 @@ guessing.
 The mine count is capped so the first revealed cell and its neighbors can
 always be mine-free. For example, a `5x5` board can have at most `16` mines.
 
-Run a quick local import smoke check from this folder:
+Example rollout:
 
-```bash
-PYTHONPATH=. python - <<'PY'
-from minesweeper import load_environment
+```text
+status: playing
+rows: 5 cols: 5 mines: 5 revealed_safe: 0/20
+coords: zero-based row col
+legend: # hidden, . clear, 1-8 adjacent mines
+last: new game initialized
 
-env = load_environment(num_examples=1, eval_examples=1)
-print(type(env).__name__)
-PY
+    0 1 2 3 4
+0 | # # # # #
+1 | # # # # #
+2 | # # # # #
+3 | # # # # #
+4 | # # # # #
+
+tool: play_minesweeper("reveal 0 0")
+
+status: playing
+rows: 5 cols: 5 mines: 5 revealed_safe: 14/20
+coords: zero-based row col
+legend: # hidden, . clear, 1-8 adjacent mines
+last: revealed 14 safe cell(s) from (0, 0)
+
+    0 1 2 3 4
+0 | . . . . .
+1 | . 1 1 2 1
+2 | . 1 # # #
+3 | 1 3 # # #
+4 | # # # # #
+
+tool: play_minesweeper("reveal 2 3")
+
+status: playing
+rows: 5 cols: 5 mines: 5 revealed_safe: 15/20
+coords: zero-based row col
+legend: # hidden, . clear, 1-8 adjacent mines
+last: revealed 1 safe cell(s) from (2, 3)
+
+    0 1 2 3 4
+0 | . . . . .
+1 | . 1 1 2 1
+2 | . 1 # 2 #
+3 | 1 3 # # #
+4 | # # # # #
+
+tool: play_minesweeper("reveal 3 2")
+
+status: playing
+rows: 5 cols: 5 mines: 5 revealed_safe: 16/20
+coords: zero-based row col
+legend: # hidden, . clear, 1-8 adjacent mines
+last: revealed 1 safe cell(s) from (3, 2)
+
+    0 1 2 3 4
+0 | . . . . .
+1 | . 1 1 2 1
+2 | . 1 # 2 #
+3 | 1 3 4 # #
+4 | # # # # #
 ```
