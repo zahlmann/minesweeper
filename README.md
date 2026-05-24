@@ -2,12 +2,6 @@
 
 Prime/Verifiers environment for Minesweeper.
 
-Prime needs this package to expose:
-
-```python
-load_environment(...) -> vf.Environment
-```
-
 The model gets one tool:
 
 ```text
@@ -31,12 +25,12 @@ coords: zero-based row col
 legend: # hidden, . clear, 1-8 adjacent mines
 last: new game initialized
 
-    0 1 2 3 4
-0 | # # # # #
-1 | # # # # #
-2 | # # # # #
-3 | # # # # #
-4 | # # # # #
+cols: 0 1 2 3 4
+row 0: # # # # #
+row 1: # # # # #
+row 2: # # # # #
+row 3: # # # # #
+row 4: # # # # #
 
 tool: play_minesweeper("reveal 0 0")
 
@@ -46,12 +40,12 @@ coords: zero-based row col
 legend: # hidden, . clear, 1-8 adjacent mines
 last: revealed 14 safe cell(s) from (0, 0)
 
-    0 1 2 3 4
-0 | . . . . .
-1 | . 1 1 2 1
-2 | . 1 # # #
-3 | 1 3 # # #
-4 | # # # # #
+cols: 0 1 2 3 4
+row 0: . . . . .
+row 1: . 1 1 2 1
+row 2: . 1 # # #
+row 3: 1 3 # # #
+row 4: # # # # #
 
 tool: play_minesweeper("reveal 2 3")
 
@@ -61,12 +55,12 @@ coords: zero-based row col
 legend: # hidden, . clear, 1-8 adjacent mines
 last: revealed 1 safe cell(s) from (2, 3)
 
-    0 1 2 3 4
-0 | . . . . .
-1 | . 1 1 2 1
-2 | . 1 # 2 #
-3 | 1 3 # # #
-4 | # # # # #
+cols: 0 1 2 3 4
+row 0: . . . . .
+row 1: . 1 1 2 1
+row 2: . 1 # 2 #
+row 3: 1 3 # # #
+row 4: # # # # #
 
 tool: play_minesweeper("reveal 3 2")
 
@@ -76,10 +70,10 @@ coords: zero-based row col
 legend: # hidden, . clear, 1-8 adjacent mines
 last: revealed 1 safe cell(s) from (3, 2)
 
-    0 1 2 3 4
-0 | . . . . .
-1 | . 1 1 2 1
-2 | . 1 # 2 #
-3 | 1 3 4 # #
-4 | # # # # #
+cols: 0 1 2 3 4
+row 0: . . . . .
+row 1: . 1 1 2 1
+row 2: . 1 # 2 #
+row 3: 1 3 4 # #
+row 4: # # # # #
 ```

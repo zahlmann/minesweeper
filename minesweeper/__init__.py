@@ -153,19 +153,11 @@ class Game:
             f"last: {self.last_message}",
             "",
         ]
-        row_width = len(str(self.config.rows - 1))
-        cell_width = max(1, len(str(self.config.cols - 1)))
-        lines.append(
-            " " * (row_width + 3)
-            + " ".join(f"{col:>{cell_width}}" for col in range(self.config.cols))
-        )
+        lines.append("cols: " + " ".join(str(col) for col in range(self.config.cols)))
 
         for row in range(self.config.rows):
-            cells = [
-                f"{self.visible((row, col)):>{cell_width}}"
-                for col in range(self.config.cols)
-            ]
-            lines.append(f"{row:>{row_width}} | " + " ".join(cells))
+            cells = [self.visible((row, col)) for col in range(self.config.cols)]
+            lines.append(f"row {row}: " + " ".join(cells))
 
         return "\n".join(lines)
 
