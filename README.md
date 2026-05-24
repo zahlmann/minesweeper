@@ -20,7 +20,7 @@ Example rollout:
 
 ```text
 status: playing
-rows: 5 cols: 5 mines: 5 revealed_safe: 0/20
+rows: 5 cols: 5 mines: 8 revealed_safe: 0/17
 coords: zero-based row col
 legend: # hidden, . clear, 1-8 adjacent mines
 last: new game initialized
@@ -35,45 +35,45 @@ row 4: # # # # #
 tool: play_minesweeper("reveal 0 0")
 
 status: playing
-rows: 5 cols: 5 mines: 5 revealed_safe: 14/20
+rows: 5 cols: 5 mines: 8 revealed_safe: 6/17
 coords: zero-based row col
 legend: # hidden, . clear, 1-8 adjacent mines
-last: revealed 14 safe cell(s) from (0, 0)
+last: revealed 6 safe cell(s) from (0, 0)
 
 cols:  0 1 2 3 4
-row 0: . . . . .
-row 1: . 1 1 2 1
-row 2: . 1 # # #
-row 3: 1 3 # # #
+row 0: . . 2 # #
+row 1: 2 2 3 # #
+row 2: # # # # #
+row 3: # # # # #
 row 4: # # # # #
 
-tool: play_minesweeper("reveal 2 3")
+tool: play_minesweeper("reveal 2 2")
 
 status: playing
-rows: 5 cols: 5 mines: 5 revealed_safe: 15/20
+rows: 5 cols: 5 mines: 8 revealed_safe: 7/17
 coords: zero-based row col
 legend: # hidden, . clear, 1-8 adjacent mines
-last: revealed 1 safe cell(s) from (2, 3)
+last: revealed 1 safe cell(s) from (2, 2)
 
 cols:  0 1 2 3 4
-row 0: . . . . .
-row 1: . 1 1 2 1
-row 2: . 1 # 2 #
-row 3: 1 3 # # #
+row 0: . . 2 # #
+row 1: 2 2 3 # #
+row 2: # # 2 # #
+row 3: # # # # #
 row 4: # # # # #
 
-tool: play_minesweeper("reveal 3 2")
+tool: play_minesweeper("reveal 3 0")
 
 status: playing
-rows: 5 cols: 5 mines: 5 revealed_safe: 16/20
+rows: 5 cols: 5 mines: 8 revealed_safe: 8/17
 coords: zero-based row col
 legend: # hidden, . clear, 1-8 adjacent mines
-last: revealed 1 safe cell(s) from (3, 2)
+last: revealed 1 safe cell(s) from (3, 0)
 
 cols:  0 1 2 3 4
-row 0: . . . . .
-row 1: . 1 1 2 1
-row 2: . 1 # 2 #
-row 3: 1 3 4 # #
+row 0: . . 2 # #
+row 1: 2 2 3 # #
+row 2: # # 2 # #
+row 3: 2 # # # #
 row 4: # # # # #
 ```

@@ -460,7 +460,7 @@ def load_environment(
     eval_examples: int = 25,
     rows: int = 5,
     cols: int = 5,
-    mines: int = 5,
+    mines: int = 8,
     base_seed: int = 1000,
     eval_base_seed: int = 2000,
     max_turns: int = 35,
