@@ -153,11 +153,21 @@ class Game:
             f"last: {self.last_message}",
             "",
         ]
-        lines.append("cols: " + " ".join(str(col) for col in range(self.config.cols)))
+        row_width = len(str(self.config.rows - 1))
+        cell_width = len(str(self.config.cols - 1))
+        row_label_width = len(f"row {self.config.rows - 1}:")
+        header_gap = " " * (row_label_width - len("cols:") + 1)
+        header_cells = " ".join(
+            f"{col:>{cell_width}}" for col in range(self.config.cols)
+        )
+        lines.append(f"cols:{header_gap}{header_cells}")
 
         for row in range(self.config.rows):
-            cells = [self.visible((row, col)) for col in range(self.config.cols)]
-            lines.append(f"row {row}: " + " ".join(cells))
+            cells = [
+                f"{self.visible((row, col)):>{cell_width}}"
+                for col in range(self.config.cols)
+            ]
+            lines.append(f"row {row:>{row_width}}: " + " ".join(cells))
 
         return "\n".join(lines)
 

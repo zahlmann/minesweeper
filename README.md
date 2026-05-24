@@ -25,7 +25,7 @@ coords: zero-based row col
 legend: # hidden, . clear, 1-8 adjacent mines
 last: new game initialized
 
-cols: 0 1 2 3 4
+cols:  0 1 2 3 4
 row 0: # # # # #
 row 1: # # # # #
 row 2: # # # # #
@@ -40,7 +40,7 @@ coords: zero-based row col
 legend: # hidden, . clear, 1-8 adjacent mines
 last: revealed 14 safe cell(s) from (0, 0)
 
-cols: 0 1 2 3 4
+cols:  0 1 2 3 4
 row 0: . . . . .
 row 1: . 1 1 2 1
 row 2: . 1 # # #
@@ -55,7 +55,7 @@ coords: zero-based row col
 legend: # hidden, . clear, 1-8 adjacent mines
 last: revealed 1 safe cell(s) from (2, 3)
 
-cols: 0 1 2 3 4
+cols:  0 1 2 3 4
 row 0: . . . . .
 row 1: . 1 1 2 1
 row 2: . 1 # 2 #
@@ -70,7 +70,7 @@ coords: zero-based row col
 legend: # hidden, . clear, 1-8 adjacent mines
 last: revealed 1 safe cell(s) from (3, 2)
 
-cols: 0 1 2 3 4
+cols:  0 1 2 3 4
 row 0: . . . . .
 row 1: . 1 1 2 1
 row 2: . 1 # 2 #
