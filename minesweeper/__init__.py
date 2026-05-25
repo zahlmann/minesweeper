@@ -13,6 +13,7 @@ PLAYING = "playing"
 WON = "won"
 LOST = "lost"
 NO_GUESS_ATTEMPTS = 1000
+TOOL_NAME = "play_minesweeper"
 
 SYSTEM_PROMPT = """Play Minesweeper by calling play_minesweeper.
 
@@ -28,6 +29,10 @@ Bad command syntax or unrelated tools end the rollout with minimum reward.
 
 class InvalidToolCommandError(ValueError):
     """Raised when the tool command is not reveal ROW COL."""
+
+
+def invalid_tool_message(error: str) -> str:
+    return f"Invalid tool call: {error}\nRollout ended with minimum reward."
 
 
 @dataclass(frozen=True)
@@ -374,68 +379,87 @@ class MinesweeperEnv(vf.StatefulToolEnv):
         state: vf.State,
         **kwargs: Any,
     ) -> vf.Messages:
-        try:
-            tool_messages = []
-            last_msg = messages[-1]
+        tool_messages = []
+        last_msg = messages[-1]
 
-            for tool_call in last_msg.tool_calls:
-                tool_call_id = tool_call.id
+        for tool_call in last_msg.tool_calls:
+            tool_call_id = tool_call.id
+            tool_name = tool_call.name
 
-                try:
-                    tool_name = tool_call.name
-                    parsed_args = json.loads(tool_call.arguments)
-                    if not isinstance(parsed_args, dict):
-                        message = (
-                            "Expected tool arguments to be a dict, got "
-                            f"{type(parsed_args).__name__}: {parsed_args}"
-                        )
-                        raise ValueError(message)
-                    tool_args = parsed_args
-                except Exception as exc:
-                    if self._should_stop_for_error(exc):
-                        raise vf.ToolParseError from exc
-                    tool_messages.append(
-                        vf.ToolMessage(
-                            role="tool",
-                            content=self.error_formatter(exc),
-                            tool_call_id=tool_call_id,
-                        )
-                    )
-                    continue
+            if tool_name != TOOL_NAME:
+                return self.end_invalid_tool_call(
+                    state,
+                    tool_messages,
+                    tool_call_id,
+                    f"unknown tool {tool_name!r}",
+                )
 
-                tool_args = self.update_tool_args(
+            try:
+                parsed_args = json.loads(tool_call.arguments)
+            except json.JSONDecodeError as exc:
+                return self.end_invalid_tool_call(
+                    state,
+                    tool_messages,
+                    tool_call_id,
+                    str(exc),
+                )
+
+            if not isinstance(parsed_args, dict):
+                message = (
+                    "expected tool arguments to be a dict, got "
+                    f"{type(parsed_args).__name__}: {parsed_args}"
+                )
+                return self.end_invalid_tool_call(
+                    state,
+                    tool_messages,
+                    tool_call_id,
+                    message,
+                )
+
+            tool_args = self.update_tool_args(
+                tool_name,
+                parsed_args,
+                messages,
+                state,
+                **kwargs,
+            )
+            try:
+                tool_message = await self.call_tool(
                     tool_name,
                     tool_args,
-                    messages,
-                    state,
-                    **kwargs,
+                    tool_call_id,
                 )
-                try:
-                    tool_message = await self.call_tool(
-                        tool_name,
-                        tool_args,
-                        tool_call_id,
-                    )
-                except Exception as exc:
-                    if self._should_stop_for_error(exc):
-                        raise vf.ToolCallError from exc
-                    tool_message = vf.ToolMessage(
-                        role="tool",
-                        content=self.error_formatter(exc),
-                        tool_call_id=tool_call_id,
-                    )
+            except (InvalidToolCommandError, TypeError) as exc:
+                return self.end_invalid_tool_call(
+                    state,
+                    tool_messages,
+                    tool_call_id,
+                    str(exc),
+                )
 
-                tool_messages.append(tool_message)
-                if game_from_state(state).status in {WON, LOST}:
-                    state["final_env_response"] = tool_messages
-                    break
-        except vf.ToolError as exc:
-            state["invalid_tool_call"] = str(exc.__cause__ or exc)
-            raise
-        except (json.JSONDecodeError, KeyError, TypeError, ValueError) as exc:
-            state["invalid_tool_call"] = str(exc)
-            raise vf.ToolCallError(str(exc)) from exc
+            tool_messages.append(tool_message)
+            if game_from_state(state).status in {WON, LOST}:
+                state["final_env_response"] = tool_messages
+                break
 
+        return tool_messages
+
+    def end_invalid_tool_call(
+        self,
+        state: vf.State,
+        tool_messages: vf.Messages,
+        tool_call_id: str,
+        error: str,
+    ) -> vf.Messages:
+        state["invalid_tool_call"] = error
+        tool_messages.append(
+            {
+                "role": "tool",
+                "content": invalid_tool_message(error),
+                "tool_call_id": tool_call_id,
+            }
+        )
+        state["final_env_response"] = tool_messages
         return tool_messages
 
     async def setup_state(self, state: vf.State) -> None:
@@ -507,6 +531,8 @@ def build_dataset(count: int, base: GameConfig) -> Dataset:
 async def game_reward(state: vf.State) -> float:
     game = game_from_state(state)
     if state.get("error") is not None:
+        return -1.0
+    if state.get("invalid_tool_call") is not None:
         return -1.0
     if state.get("stop_condition") == "no_tools_called":
         return -1.0

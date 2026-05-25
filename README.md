@@ -12,6 +12,7 @@ The board is shown in the initial prompt and returned after every tool call.
 Boards are generated in no-guess mode: random mine layouts are rejected until
 the built-in logic solver can clear the board from the first reveal without
 guessing.
+Malformed commands or unrelated tool calls end the rollout with `-1` reward.
 
 The mine count is capped so the first revealed cell and its neighbors can
 always be mine-free. For example, a `5x5` board can have at most `16` mines.
