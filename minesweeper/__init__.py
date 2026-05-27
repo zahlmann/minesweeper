@@ -35,44 +35,6 @@ def invalid_tool_message(error: str) -> str:
     return f"Invalid tool call: {error}\nRollout ended with minimum reward."
 
 
-def get_tool_calls(message: Any) -> list[Any]:
-    if isinstance(message, dict):
-        return message.get("tool_calls") or []
-    return getattr(message, "tool_calls", None) or []
-
-
-def get_tool_call_id(tool_call: Any) -> str:
-    if isinstance(tool_call, dict):
-        return tool_call.get("id", "")
-    return getattr(tool_call, "id", "")
-
-
-def get_tool_call_name(tool_call: Any) -> str:
-    if isinstance(tool_call, dict):
-        function = tool_call.get("function") or {}
-        if isinstance(function, dict):
-            return function.get("name", "")
-        return tool_call.get("name", "")
-
-    function = getattr(tool_call, "function", None)
-    if function is not None:
-        return getattr(function, "name", "")
-    return getattr(tool_call, "name", "")
-
-
-def get_tool_call_arguments(tool_call: Any) -> str:
-    if isinstance(tool_call, dict):
-        function = tool_call.get("function") or {}
-        if isinstance(function, dict):
-            return function.get("arguments", "")
-        return tool_call.get("arguments", "")
-
-    function = getattr(tool_call, "function", None)
-    if function is not None:
-        return getattr(function, "arguments", "")
-    return getattr(tool_call, "arguments", "")
-
-
 @dataclass(frozen=True)
 class GameConfig:
     rows: int
@@ -420,9 +382,9 @@ class MinesweeperEnv(vf.StatefulToolEnv):
         tool_messages = []
         last_msg = messages[-1]
 
-        for tool_call in get_tool_calls(last_msg):
-            tool_call_id = get_tool_call_id(tool_call)
-            tool_name = get_tool_call_name(tool_call)
+        for tool_call in last_msg.tool_calls:
+            tool_call_id = tool_call.id
+            tool_name = tool_call.name
 
             if tool_name != TOOL_NAME:
                 return self.end_invalid_tool_call(
@@ -433,7 +395,7 @@ class MinesweeperEnv(vf.StatefulToolEnv):
                 )
 
             try:
-                parsed_args = json.loads(get_tool_call_arguments(tool_call))
+                parsed_args = json.loads(tool_call.arguments)
             except json.JSONDecodeError as exc:
                 return self.end_invalid_tool_call(
                     state,
@@ -500,10 +462,10 @@ class MinesweeperEnv(vf.StatefulToolEnv):
         state["final_env_response"] = tool_messages
         return tool_messages
 
-    async def setup_state(self, state: vf.State) -> vf.State:
+    async def setup_state(self, state: vf.State) -> None:
         game = Game.new(config_from_state(state))
         state["game"] = game.to_dict()
-        return await super().setup_state(state)
+        await super().setup_state(state)
 
     def update_tool_args(
         self,
