@@ -462,10 +462,10 @@ class MinesweeperEnv(vf.StatefulToolEnv):
         state["final_env_response"] = tool_messages
         return tool_messages
 
-    async def setup_state(self, state: vf.State) -> None:
+    async def setup_state(self, state: vf.State) -> vf.State:
         game = Game.new(config_from_state(state))
         state["game"] = game.to_dict()
-        await super().setup_state(state)
+        return await super().setup_state(state)
 
     def update_tool_args(
         self,
