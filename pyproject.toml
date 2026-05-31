@@ -2,7 +2,7 @@
 name = "minesweeper"
 description = "Minesweeper environment for Prime"
 tags = ["minesweeper", "games"]
-version = "0.1.8"
+version = "0.1.9"
 requires-python = ">=3.10"
 dependencies = [
     "datasets",
