@@ -7,6 +7,11 @@ from typing import Any
 from datasets import Dataset
 import verifiers as vf
 
+try:
+    from verifiers.types import ToolMessage as VfToolMessage
+except ImportError:
+    VfToolMessage = None
+
 Cell = tuple[int, int]
 
 PLAYING = "playing"
@@ -33,6 +38,20 @@ class InvalidToolCommandError(ValueError):
 
 def invalid_tool_message(error: str) -> str:
     return f"Invalid tool call: {error}\nRollout ended with minimum reward."
+
+
+def make_tool_message(content: str, tool_call_id: str) -> vf.Message:
+    if VfToolMessage is None:
+        return {
+            "role": "tool",
+            "content": content,
+            "tool_call_id": tool_call_id,
+        }
+    return VfToolMessage(
+        role="tool",
+        content=content,
+        tool_call_id=tool_call_id,
+    )
 
 
 @dataclass(frozen=True)
@@ -453,11 +472,7 @@ class MinesweeperEnv(vf.StatefulToolEnv):
     ) -> vf.Messages:
         state["invalid_tool_call"] = error
         tool_messages.append(
-            {
-                "role": "tool",
-                "content": invalid_tool_message(error),
-                "tool_call_id": tool_call_id,
-            }
+            make_tool_message(invalid_tool_message(error), tool_call_id)
         )
         state["final_env_response"] = tool_messages
         return tool_messages
