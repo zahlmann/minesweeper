@@ -315,6 +315,7 @@ class Game:
 
     def invalid(self, message: str) -> str:
         self.invalid_commands += 1
+        self.status = LOST
         self.last_message = f"INVALID: {message}"
         return self.render()
 
@@ -552,9 +553,8 @@ async def game_reward(state: vf.State) -> float:
     if state.get("stop_condition") == "no_tools_called":
         return -1.0
 
-    invalid_penalty = 0.1 * game.invalid_commands
     if game.status == WON:
-        return max(-1.0, 1.0 - invalid_penalty)
+        return 1.0
 
     return -1.0
 
